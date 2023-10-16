@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Getter @Setter
-public class UserSignUpRequest {
+public class UserJoinRequest {
 
     @NotBlank(message = "올바른 형식의 이메일이 아닙니다.")
     @Email
@@ -29,7 +29,7 @@ public class UserSignUpRequest {
     private LocalDateTime birth;
 
     @NotBlank(message = "올바른 형식의 닉네임이 아닙니다.")
-    @Size(min = 2, max = 10, message = "닉네임의 길이는 2자 이상 10자 이하로 입력하세요,")
+    @Size(min = 2, max = 10, message = "닉네임의 길이는 2자 이상 10자 이하로 입력하세요.")
     private String nickname;
 
     private int phoneNum;

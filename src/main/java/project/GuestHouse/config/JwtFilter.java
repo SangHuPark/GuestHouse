@@ -53,7 +53,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 User user = userService.getUserByUserName(userName);
                 logger.info("userName:{}, userRole:{}", user.getUserName(), user.getRole());
 
-
                 //문열어주기 >> 허용
                 //Role 바인딩
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserName(), null, List.of(new SimpleGrantedAuthority(user.getRole().name())));
