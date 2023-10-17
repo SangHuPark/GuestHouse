@@ -23,9 +23,9 @@ public class UserJoinRequest {
 
     @NotBlank(message = "올바른 형식의 이름이 아닙니다.")
     @Size(min = 2, message = "이름은 2자 이상 입력하세요.")
-    private String name;
+    private String userName;
 
-    @NotBlank()
+    @NotBlank(message = "생일을 입력하세요.")
     private LocalDateTime birth;
 
     @NotBlank(message = "올바른 형식의 닉네임이 아닙니다.")
@@ -38,7 +38,7 @@ public class UserJoinRequest {
         return User.builder()
                 .email(this.email)
                 .password(password)
-                .name(this.name)
+                .userName(this.userName)
                 .birth(this.birth)
                 .nickname(this.nickname)
                 .phoneNum(this.phoneNum)
