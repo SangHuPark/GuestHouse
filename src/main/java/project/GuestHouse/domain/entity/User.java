@@ -28,7 +28,7 @@ public class User extends BaseEntity {
     private String password;
 
     @Column(name = "name", nullable = false)
-    private String name;
+    private String userName;
 
     @Column(name = "birth", nullable = false)
     private LocalDateTime birth;
@@ -50,7 +50,6 @@ public class User extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "social_uuid")
     private Social social;
-
 
     public UserDto toDto() {
         return UserDto.builder()
