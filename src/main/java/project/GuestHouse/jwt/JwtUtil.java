@@ -19,8 +19,8 @@ public class JwtUtil {
                 .compact();
     }
 
-    public static String getUserName(String token, String secretKey){
-        return extractClaims(token, secretKey).get("userName",String.class);
+    public static String getNickname(String token, String secretKey){
+        return extractClaims(token, secretKey).get("nickname",String.class);
     }
 
     public static boolean isExpired(String token, String secretKey){
