@@ -50,16 +50,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if(authorizationHeader.startsWith("Bearer ")){
             try{
-                String userName = JwtUtil.getUserName(token, secretKey);
-                //UserName Token에서 꺼내기
-                log.info("userName : {}", userName);
+                String nickname = JwtUtil.getNickname(token, secretKey);
+                //Nickname Token에서 꺼내기
+                log.info("nickname : {}", nickname);
                 //UserDetail 가져오기 >> UserRole
-                User user = userService.getUserByUserName(userName);
-                log.info("userName:{}, userRole:{}", user.getUserName(), user.getUserType());
+                User user = userService.getUserByNickname(nickname);
+                log.info("nickname:{}, userRole:{}", user.getNickname(), user.getUserType());
 
                 //문열어주기 >> 허용
                 //Role 바인딩
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserName(), null, List.of(new SimpleGrantedAuthority(user.getUserType().name())));
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getNickname(), null, List.of(new SimpleGrantedAuthority(user.getUserType().name())));
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
