@@ -1,4 +1,4 @@
-package project.GuestHouse.util;
+package project.GuestHouse.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
