@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import project.GuestHouse.domain.dto.user.UserDto;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,13 +32,13 @@ public class User extends BaseEntity {
     private String userName;
 
     @Column(name = "birth", nullable = false)
-    private LocalDateTime birth;
+    private LocalDate birth;
 
     @Column(name = "nickname", unique = true, nullable = false)
     private String nickname;
 
     @Column(name = "phone_num", unique = true, nullable = false)
-    private int phoneNum;
+    private String phoneNum;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false)
