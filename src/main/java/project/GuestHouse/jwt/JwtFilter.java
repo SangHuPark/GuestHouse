@@ -15,7 +15,6 @@ import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.exception.ErrorCode;
 import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.service.UserService;
-import project.GuestHouse.jwt.JwtUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -40,6 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("authorizationHeader : {}", authorizationHeader);
 
         String token;
+
         try {
             token = authorizationHeader.split(" ")[1];
         } catch (Exception e) {
