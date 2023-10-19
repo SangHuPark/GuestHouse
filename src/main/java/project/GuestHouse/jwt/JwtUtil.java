@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class JwtUtil {
 
-    public static String createToken(String nickname,String key,long expireTimeMs){
+    public static String createToken(String nickname, String key, long expireTimeMs){
         Claims claims = Jwts.claims();
         claims.put("nickname",nickname);
 
