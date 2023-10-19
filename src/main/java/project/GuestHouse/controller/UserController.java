@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import project.GuestHouse.domain.dto.Response;
-import project.GuestHouse.domain.dto.user.UserDto;
-import project.GuestHouse.domain.dto.user.UserJoinRequest;
-import project.GuestHouse.domain.dto.user.UserJoinResponse;
-import project.GuestHouse.domain.dto.user.UserLoginRequest;
+import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.service.UserService;
 
 import javax.validation.Valid;
@@ -21,13 +18,15 @@ public class UserController {
 
     @PostMapping("/join")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto join(@Valid @RequestBody UserJoinRequest userJoinRequest) {
-        return userService.join(userJoinRequest);
+    public Response<UserJoinResponse> join(@Valid @RequestBody UserJoinRequest userJoinRequest) {
+        UserDto userDto = userService.join(userJoinRequest);
+        return Response.success(new UserJoinResponse(userDto.getEmail(), userDto.getNickname()));
     }
 
     @PostMapping("/login")
-    public String login(@Valid @RequestBody UserLoginRequest userLoginRequest) {
-        return userService.login(userLoginRequest);
+    public Response<UserLoginResponse> login(@Valid @RequestBody UserLoginRequest userLoginRequest) {
+        String token = userService.login(userLoginRequest);
+        return Response.success(new UserLoginResponse(token));
     }
 
 }
