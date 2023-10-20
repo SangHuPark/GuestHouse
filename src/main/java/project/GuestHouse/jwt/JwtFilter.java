@@ -48,32 +48,31 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        if(authorizationHeader.startsWith("Bearer ")){
-            try{
+        if (authorizationHeader.startsWith("Bearer ")){
+            try {
                 String nickname = JwtUtil.getNickname(token, secretKey);
-                //Nickname Token에서 꺼내기
+                // Nickname Token에서 꺼내기
                 log.info("nickname : {}", nickname);
-                //UserDetail 가져오기 >> UserRole
+                // UserDetail 가져오기 >> UserRole
                 User user = userService.getUserByNickname(nickname);
                 log.info("nickname:{}, userRole:{}", user.getNickname(), user.getUserType());
 
-                //문열어주기 >> 허용
-                //Role 바인딩
+                // 문 열어주기 >> 허용
+                // Role 바인딩
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getNickname(), null, List.of(new SimpleGrantedAuthority(user.getUserType().name())));
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            }catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 throw new GuestException(ErrorCode.INVALID_TOKEN);
-            }catch (ExpiredJwtException e){
+            } catch (ExpiredJwtException e) {
                 log.info("만료된 토큰입니다.");
-                throw new GuestException(ErrorCode.INVALID_TOKEN,"토큰 기한 만료");
-            }catch (SignatureException e){
+                throw new GuestException(ErrorCode.INVALID_TOKEN, "토큰 기한 만료");
+            } catch (SignatureException e) {
                 log.info("서명이 일치하지 않습니다.");
-                throw new GuestException(ErrorCode.INVALID_TOKEN,"서명 불일치");
+                throw new GuestException(ErrorCode.INVALID_TOKEN, "서명 불일치");
             }
-        }
-        else{
+        } else {
             log.error("헤더를 가져오는 과정에서 에러가 났습니다. 헤더가 null이거나 잘못되었습니다.");
         }
         filterChain.doFilter(request, response);
