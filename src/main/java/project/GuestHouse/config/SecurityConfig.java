@@ -30,7 +30,10 @@ public class SecurityConfig {
         return httpSecurity
                 .httpBasic().disable()
                 .csrf().disable()
-                .cors().and()
+
+                .cors()
+                .and()
+
                 .authorizeRequests()
                 .antMatchers("/api/users/join", "/api/users/login").permitAll() // join, login 허용
                 .antMatchers(HttpMethod.POST,"/**").authenticated()
@@ -38,10 +41,13 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.PUT,"/**").authenticated()
 //                .antMatchers(HttpMethod.GET,"/alarms").authenticated()
                 .and()
+
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt사용하는 경우 씀
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt 사용하는 경우 씀
                 .and()
+
                 .addFilterBefore(new JwtFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JWTTokenFilter를 적용
+
                 .build();
     }
 
