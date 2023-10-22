@@ -40,7 +40,6 @@ public class UserService {
                     throw new GuestException(ErrorCode.DUPLICATED_USER_EMAIL);
                 });
 
-
         User savedUser = userRepository.save(userJoinRequest.toEntity(encoder.encode(userJoinRequest.getPassword())));
 
         return savedUser.toDto();
