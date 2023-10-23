@@ -25,7 +25,6 @@ public class JwtUtil {
         Claims claims = Jwts.claims();
         claims.put("nickname",nickname);
 
-
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
