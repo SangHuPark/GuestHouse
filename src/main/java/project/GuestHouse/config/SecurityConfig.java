@@ -20,10 +20,15 @@ import project.GuestHouse.service.UserService;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserService userService;
+    private UserService userService;
 
     @Value("${jwt.secret}")
     private String secretKey;
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -43,11 +48,10 @@ public class SecurityConfig {
                 .and()
 
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt 사용하는 경우 씀
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // session 을 사용하지 않고 jwt 사용하는 경우
                 .and()
 
-                .addFilterBefore(new JwtFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JWTTokenFilter를 적용
-
+                .addFilterBefore(new JwtFilter(secretKey), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JWTTokenFilter 적용
                 .build();
     }
 
