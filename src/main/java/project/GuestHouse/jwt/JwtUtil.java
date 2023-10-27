@@ -13,16 +13,12 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    /*@Value("${jwt.secret}")
+    @Value("${jwt.secret}")
     private String secretKey;
 
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-    }*/
-
-    public static String createToken(String nickname, String secretKey, long expireTimeMs){
+    public static String createToken(String nickname, String secretKey, long expireTimeMs) {
         Claims claims = Jwts.claims();
+        // Jwts 클래스에서 제공하는 일종의 Map 자료구조
         claims.put("nickname",nickname);
 
         return Jwts.builder()
@@ -33,16 +29,16 @@ public class JwtUtil {
                 .compact();
     }
 
-    public static String getNickname(String token, String secretKey){
-        return extractClaims(token, secretKey).get("nickname", String.class);
-    }
-
-    public static boolean isExpired(String token, String secretKey){
+    public static boolean isExpired(String token, String secretKey) {
         Date expirationDate = extractClaims(token, secretKey).getExpiration();
         return expirationDate.before(new Date());
     }
 
-    private static Claims extractClaims(String token, String key){
-        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
+    private static Claims extractClaims(String token, String secretKey) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
+
+    public static String getNickname(String token, String secretKey) {
+        return extractClaims(token, secretKey).get("nickname", String.class);
     }
 }
