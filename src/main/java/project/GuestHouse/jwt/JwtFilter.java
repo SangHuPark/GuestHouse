@@ -1,7 +1,5 @@
 package project.GuestHouse.jwt;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,23 +9,20 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import project.GuestHouse.domain.entity.User;
-import project.GuestHouse.exception.ErrorCode;
-import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.service.UserService;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
-
-    private final UserService userService;
 
     @Value("${jwt.secret}")
     private final String secretKey;
@@ -35,46 +30,40 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        log.info("authorizationHeader : {}", authorizationHeader);
+        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        logger.info("authorization : " + authorization);
 
-        String token;
+        // 토큰이 없거나 Bearer 형태로 보내지 않으면 block
+        // 권한이 없는 요청,응답 객체를 필터에 넣어 주어야 한다.
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            logger.error("잘못된 authorization");
+            filterChain.doFilter(request, response); // filterChain 에 request, response 를 넘긴다. (request 객체에 인증 되었다고 인증 도장이 찍히는 의미)
+            return;
+        }
 
-        try {
-            token = authorizationHeader.split(" ")[1];
-        } catch (Exception e) {
-            log.error("token 추출에 실패했습니다.");
+        // token 꺼내기
+        // "Bearer {token}" 형식으로 공백을 split 후 1번째를 가져오면 token 만 추출됨
+        String token = authorization.split(" ")[1];
+        logger.info("token : " + token);
+
+        // token Expired 되었는지
+        if(JwtUtil.isExpired(token, secretKey)) {
+            logger.error("Token 만료 되었습니다.");
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (authorizationHeader.startsWith("Bearer ")){
-            try {
-                String nickname = JwtUtil.getNickname(token, secretKey);
-                // Nickname Token에서 꺼내기
-                log.info("nickname : {}", nickname);
-                // UserDetail 가져오기 >> UserRole
-                User user = userService.getUserByNickname(nickname);
-                log.info("nickname:{}, userRole:{}", user.getNickname(), user.getUserType());
+        //username token 꺼내기
+        String nickname = JwtUtil.getNickname(token, secretKey);
+        logger.info("nickname: " + nickname);
 
-                // 문 열어주기 >> 허용
-                // Role 바인딩
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getNickname(), null, List.of(new SimpleGrantedAuthority(user.getUserType().name())));
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(nickname, null, List.of(new SimpleGrantedAuthority("USER")));
 
-            } catch (IllegalArgumentException e) {
-                throw new GuestException(ErrorCode.INVALID_TOKEN);
-            } catch (ExpiredJwtException e) {
-                log.info("만료된 토큰입니다.");
-                throw new GuestException(ErrorCode.INVALID_TOKEN, "토큰 기한 만료");
-            } catch (SignatureException e) {
-                log.info("서명이 일치하지 않습니다.");
-                throw new GuestException(ErrorCode.INVALID_TOKEN, "서명 불일치");
-            }
-        } else {
-            log.error("헤더를 가져오는 과정에서 에러가 났습니다. 헤더가 null이거나 잘못되었습니다.");
-        }
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
         filterChain.doFilter(request, response);
     }
 }
