@@ -16,6 +16,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
 
+
     public static String createToken(String nickname, String secretKey, long expireTimeMs) {
         Claims claims = Jwts.claims();
         // Jwts 클래스에서 제공하는 일종의 Map 자료구조
