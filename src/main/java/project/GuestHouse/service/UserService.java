@@ -54,7 +54,7 @@ public class UserService {
             throw new GuestException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return JwtUtil.createToken(user.getNickname(), secretKey, expireTimeMs);
+        return JwtUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
     }
 
     public User getUserByNickname(String userEmail) {

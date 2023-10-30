@@ -9,15 +9,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import project.GuestHouse.service.UserService;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -53,12 +50,12 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        //username token 꺼내기
-        String nickname = JwtUtil.getNickname(token, secretKey);
-        logger.info("nickname: " + nickname);
+        // email token 에서 꺼내기
+        String email = JwtUtil.getEmail(token, secretKey);
+        logger.info("email: " + email);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(nickname, null, List.of(new SimpleGrantedAuthority("USER")));
+                new UsernamePasswordAuthenticationToken(email, null, List.of(new SimpleGrantedAuthority("USER")));
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

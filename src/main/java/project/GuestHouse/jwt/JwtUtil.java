@@ -13,13 +13,13 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+   /* @Value("${jwt.secret}")
+    private String secretKey;*/
 
-    public static String createToken(String nickname, String secretKey, long expireTimeMs) {
+    public static String createToken(String email, String secretKey, long expireTimeMs) {
         Claims claims = Jwts.claims();
         // Jwts 클래스에서 제공하는 일종의 Map 자료구조
-        claims.put("nickname",nickname);
+        claims.put("email", email);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -29,16 +29,16 @@ public class JwtUtil {
                 .compact();
     }
 
+    private static Claims extractClaims(String token, String secretKey) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
+
     public static boolean isExpired(String token, String secretKey) {
         Date expirationDate = extractClaims(token, secretKey).getExpiration();
         return expirationDate.before(new Date());
     }
 
-    private static Claims extractClaims(String token, String secretKey) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-    }
-
-    public static String getNickname(String token, String secretKey) {
-        return extractClaims(token, secretKey).get("nickname", String.class);
+    public static String getEmail(String token, String secretKey) {
+        return extractClaims(token, secretKey).get("email", String.class);
     }
 }
