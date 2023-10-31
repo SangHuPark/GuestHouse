@@ -2,20 +2,25 @@ package project.GuestHouse.domain.dto;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 
 @AllArgsConstructor
+@Builder
 @Getter
 public class Response<T> {
-    private String resultCode;
-    private T result;
+    private  boolean isSuccess;
+    private String message;
+    private T body;
+    /*private T result;
 
-    public static <T> Response<T> success(T result){
-        return new Response<>("SUCCESS",result);
+    public static <T> Response<T> success(String message, T result){
+        return new Response<>(true, message, result);
     }
 
-    public static <T> Response<T> error(T result){
-        return new Response<>("ERROR",result);
-    }
+    public static <T> Response<T> error(String message, T result){
+        return new Response<>(false, message, result);
+    }*/
 }
