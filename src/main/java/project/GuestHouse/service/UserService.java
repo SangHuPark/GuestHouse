@@ -7,12 +7,16 @@ import org.springframework.stereotype.Service;
 import project.GuestHouse.domain.dto.user.UserDto;
 import project.GuestHouse.domain.dto.user.UserJoinRequest;
 import project.GuestHouse.domain.dto.user.UserLoginRequest;
+import project.GuestHouse.domain.dto.user.UserLoginResponse;
 import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.exception.ErrorCode;
 import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.jwt.JwtUtil;
 import project.GuestHouse.repository.UserRepository;
 import project.GuestHouse.util.ValidateUtil;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -35,7 +39,7 @@ public class UserService {
     private String secretKey;
 
     public UserDto join(UserJoinRequest userJoinRequest) {
-        userRepository.findByEmail(userJoinRequest.getEmail())
+        userRepository.findUserByEmail(userJoinRequest.getEmail())
                 .ifPresent(user -> {
                     throw new GuestException(ErrorCode.DUPLICATED_USER_EMAIL);
                 });
@@ -45,7 +49,7 @@ public class UserService {
         return savedUser.toDto();
     }
 
-    public String login(UserLoginRequest userLoginRequest) {
+    public UserLoginResponse login(UserLoginRequest userLoginRequest) {
         String userEmail = userLoginRequest.getEmail();
 
         User user = validateUtil.validateUser(userEmail);
@@ -54,11 +58,33 @@ public class UserService {
             throw new GuestException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return JwtUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
+        String token = JwtUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
+
+        return new UserLoginResponse(userEmail, token);
     }
 
-    public User getUserByNickname(String userEmail) {
-        return userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new GuestException(ErrorCode.NICKNAME_NOT_FOUND));
+    public List<User> findAllUser() {
+        return userRepository.findAll();
+    }
+
+    public User findUserByEmail(String userEmail) {
+        return userRepository.findUserByEmail(userEmail)
+                .orElseThrow(() -> new GuestException(ErrorCode.USER_EMAIL_NOT_FOUND));
+    }
+
+    public boolean updateUserPassword(Long id, String password) {
+        Optional<User> result = userRepository.findUserById(id);
+        // null 이 아니면 get()의 결과가 넘어온다.
+        User user = result.orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
+        user.updatePassword(password);
+        userRepository.save(user);
+        return true;
+    }
+
+    public boolean deleteUser(Long id) {
+        Optional<User> result = userRepository.findUserById(id);
+        User user = result.orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
+        userRepository.delete(user);
+        return true;
     }
 }
