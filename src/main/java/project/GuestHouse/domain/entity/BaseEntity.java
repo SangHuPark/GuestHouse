@@ -7,7 +7,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @MappedSuperclass
@@ -23,9 +22,9 @@ public class BaseEntity {
 
     private LocalDateTime deletedAt;
 
-    public void delete(){
+    /*public void delete(User user){
         this.deletedAt = LocalDateTime.now();
-    }
+    }*/
 
     /*@PrePersist
     public void onPrePersist(){
