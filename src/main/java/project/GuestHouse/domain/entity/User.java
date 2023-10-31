@@ -17,10 +17,9 @@ import java.util.UUID;
 public class User extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name="uuid2", strategy = "uuid2")
-    @Column(name = "user_id", columnDefinition = "BINARY(16)")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long id;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -57,6 +56,10 @@ public class User extends BaseEntity {
                 .email(this.email)
                 .nickname(this.nickname)
                 .build();
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
 }
