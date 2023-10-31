@@ -2,12 +2,17 @@ package project.GuestHouse.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.service.UserService;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -18,15 +23,41 @@ public class UserController {
 
     @PostMapping("/join")
     @ResponseStatus(HttpStatus.CREATED)
-    public Response<UserJoinResponse> join(@Valid @RequestBody UserJoinRequest userJoinRequest) {
+    public ResponseEntity<?> join(@Valid @RequestBody UserJoinRequest userJoinRequest, BindingResult bindingResult) {
+        bindingResultErrorsCheck(bindingResult);
         UserDto userDto = userService.join(userJoinRequest);
-        return Response.success(new UserJoinResponse(userDto.getEmail(), userDto.getNickname()));
+        return new ResponseEntity<>(Response.builder()
+                .isSuccess(true)
+                .message("회원가입 완료")
+                .body(new UserJoinResponse(userDto.getEmail(), userDto.getNickname())).build(), HttpStatus.OK);
+        // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
     }
 
     @PostMapping("/login")
-    public Response<UserLoginResponse> login(@Valid @RequestBody UserLoginRequest userLoginRequest) {
-        String token = userService.login(userLoginRequest);
-        return Response.success(new UserLoginResponse(token));
+    public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest userLoginRequest, BindingResult bindingResult) {
+        try {
+            bindingResultErrorsCheck(bindingResult);
+            UserLoginResponse userLoginResponse = userService.login(userLoginRequest);
+            return new ResponseEntity<>(Response.builder()
+                    .isSuccess(true)
+                    .message("로그인 성공")
+                    .body(userLoginResponse).build(), HttpStatus.OK);
+            // return Respose.success("로그인 성공", userLoginResponse);
+        } catch (Exception e) {
+            return new ResponseEntity<>(Response.builder()
+                    .isSuccess(false)
+                    .message("로그인 실패")
+                    .body(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+        }
     }
 
+    private void bindingResultErrorsCheck(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errorMap = new HashMap<>();
+            for (FieldError fe : bindingResult.getFieldErrors()) {
+                errorMap.put(fe.getField(), fe.getDefaultMessage());
+            }
+            throw new RuntimeException(errorMap.toString());
+        }
+    }
 }
