@@ -21,7 +21,7 @@ public class ValidateUtil {
     }
 
     public User validateUser(String userEmail) {
-        return userRepository.findByEmail(userEmail)
+        return userRepository.findUserByEmail(userEmail)
                 .orElseThrow(() -> new GuestException(ErrorCode.NICKNAME_NOT_FOUND));
     }
 }
