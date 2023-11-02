@@ -3,15 +3,18 @@ package project.GuestHouse.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
+import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.service.UserService;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -49,6 +52,41 @@ public class UserController {
                     .message("로그인 실패")
                     .body(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/search/all")
+    public ResponseEntity<?> searchAllUser() {
+        List<User> users = userService.findAllUser();
+        return new ResponseEntity<>(Response.builder()
+                .isSuccess(true)
+                .message("전체 회원 조회 완료")
+                .body(users).build(), HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<?> searchUser(@Valid @RequestBody String email) {
+        User user = userService.findUserByEmail(email);
+        return new ResponseEntity<>(Response.builder()
+                .isSuccess(true)
+                .message("회원 조회 완료")
+                .body(user).build(), HttpStatus.OK);
+    }
+
+    @PatchMapping("/update/password")
+    public ResponseEntity<?> updatePasswordById(@Valid @RequestBody Long id, @Valid @RequestBody String password) {
+        userService.updateUserPassword(id, password);
+        return new ResponseEntity<>(Response.builder()
+                .isSuccess(true)
+                .message("비밀번호 변경 완료")
+                .body(password).build(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteUserById(@PathVariable("id") Long id) {
+        userService.deleteUser(id);
+        return new ResponseEntity<>(Response.builder()
+                .isSuccess(true)
+                .message("회원 탈퇴 완료").build(), HttpStatus.OK);
     }
 
     private void bindingResultErrorsCheck(BindingResult bindingResult) {
