@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import project.GuestHouse.jwt.JwtFilter;
+import project.GuestHouse.jwt.JwtTokenProvider;
 import project.GuestHouse.service.UserService;
 
 @Configuration
@@ -20,10 +21,7 @@ import project.GuestHouse.service.UserService;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private UserService userService;
-
-    @Value("${jwt.secret}")
-    private String secretKey;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -51,7 +49,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // session 을 사용하지 않고 jwt 사용하는 경우
                 .and()
 
-                .addFilterBefore(new JwtFilter(secretKey), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JWTTokenFilter 적용
+                .addFilterBefore(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class) // UserNamePasswordAuthenticationFilter 적용하기 전에 JWTTokenFilter 적용
                 .build();
     }
 

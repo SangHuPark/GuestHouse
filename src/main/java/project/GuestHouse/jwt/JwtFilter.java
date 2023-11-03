@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -21,13 +22,15 @@ import java.util.List;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Value("${jwt.secret}")
-    private final String secretKey;
+    /*@Value("${jwt.secret}")
+    private final String secretKey;*/
 
-    @Override
+    private final JwtTokenProvider jwtTokenProvider;
+
+    /*@Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authorization = jwtTokenProvider.resolveToken(request);
         logger.info("authorization : " + authorization);
 
         // 토큰이 없거나 Bearer 형태로 보내지 않으면 block
@@ -44,14 +47,14 @@ public class JwtFilter extends OncePerRequestFilter {
         logger.info("token : " + token);
 
         // token Expired 되었는지
-        if(JwtUtil.isExpired(token, secretKey)) {
+        if(jwtTokenProvider.isExpired(token, secretKey)) {
             logger.error("Token 만료 되었습니다.");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // email token 에서 꺼내기
-        String email = JwtUtil.getEmail(token, secretKey);
+        // token 에서 email 꺼내기
+        String email = jwtTokenProvider.getEmail(token, secretKey);
         logger.info("email: " + email);
 
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -61,6 +64,25 @@ public class JwtFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
+        filterChain.doFilter(request, response);
+    }*/
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // 헤더에서 토큰 받아오기
+        String token = jwtTokenProvider.resolveToken(request);
+
+        // 토큰이 유효하다면
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+
+            // 토큰으로부터 유저 정보를 받아
+            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+
+            // SecurityContext 에 객체 저장
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        // 다음 Filter 실행
         filterChain.doFilter(request, response);
     }
 }

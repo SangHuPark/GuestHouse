@@ -1,7 +1,7 @@
 package project.GuestHouse.service;
 
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.GuestHouse.domain.dto.user.UserDto;
@@ -11,7 +11,7 @@ import project.GuestHouse.domain.dto.user.UserLoginResponse;
 import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.exception.ErrorCode;
 import project.GuestHouse.exception.GuestException;
-import project.GuestHouse.jwt.JwtUtil;
+import project.GuestHouse.jwt.JwtTokenProvider;
 import project.GuestHouse.repository.UserRepository;
 import project.GuestHouse.util.ValidateUtil;
 
@@ -24,19 +24,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final ValidateUtil validateUtil;
     private final BCryptPasswordEncoder encoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder encoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder encoder, JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.validateUtil = ValidateUtil.builder()
                 .userRepository(userRepository)
                 .build();
+        this.jwtTokenProvider = jwtTokenProvider;
     }
-
-    private long expireTimeMs = 1000 * 60 * 60; // 1시간
-
-    @Value("${jwt.secret}")
-    private String secretKey;
 
     public UserDto join(UserJoinRequest userJoinRequest) {
         userRepository.findUserByEmail(userJoinRequest.getEmail())
@@ -50,25 +47,25 @@ public class UserService {
     }
 
     public UserLoginResponse login(UserLoginRequest userLoginRequest) {
-        String userEmail = userLoginRequest.getEmail();
+        String email = userLoginRequest.getEmail();
 
-        User user = validateUtil.validateUser(userEmail);
+        User user = validateUtil.validateUser(email);
 
         if (!encoder.matches(userLoginRequest.getPassword(), user.getPassword())) {
             throw new GuestException(ErrorCode.INVALID_PASSWORD);
         }
 
-        String token = JwtUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
+        String token = jwtTokenProvider.createToken(user.getEmail());
 
-        return new UserLoginResponse(userEmail, token);
+        return new UserLoginResponse(email, token);
     }
 
     public List<User> findAllUser() {
         return userRepository.findAll();
     }
 
-    public User findUserByEmail(String userEmail) {
-        return userRepository.findUserByEmail(userEmail)
+    public User findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new GuestException(ErrorCode.USER_EMAIL_NOT_FOUND));
     }
 
