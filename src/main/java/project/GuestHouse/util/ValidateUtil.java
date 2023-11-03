@@ -20,8 +20,8 @@ public class ValidateUtil {
         this.userRepository = userRepository;
     }
 
-    public User validateUser(String userEmail) {
-        return userRepository.findUserByEmail(userEmail)
+    public User validateUser(String email) {
+        return userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new GuestException(ErrorCode.NICKNAME_NOT_FOUND));
     }
 }
