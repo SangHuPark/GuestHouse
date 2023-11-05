@@ -4,11 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
@@ -28,7 +28,9 @@ public class JwtTokenProvider {
     }
 
     public String createToken(String email) {
+        // 원하는 정보를 담기 위한 Claim 이라는 공간을 jwt 에서 제공.
         Claims claims = Jwts.claims();
+
         // Jwts 클래스에서 제공하는 일종의 Map 자료구조
         claims.put("email", email);
 
@@ -44,25 +46,25 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public Authentication getAuthentication(String token) {
+    /*public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailService.loadUserByUsername(this.getUserPk(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader(HttpHeaders.AUTHORIZATION);
+    }*/
+
+    public boolean isExpired(String token) {
+        return extractClaims(token).getExpiration().before(new Date());
     }
 
-    public boolean isExpired(String token, String secretKey) {
-        Date expirationDate = extractClaims(token, secretKey).getExpiration();
-        return expirationDate.before(new Date());
+    public String getEmail(String token) {
+        return extractClaims(token).get("email", String.class);
     }
 
-    public Claims extractClaims(String token, String secretKey) {
+    public Claims extractClaims(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
-    public String getEmail(String token, String secretKey) {
-        return extractClaims(token, secretKey).get("email", String.class);
-    }
 }
