@@ -27,7 +27,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> join(@Valid @RequestBody UserJoinRequest userJoinRequest, BindingResult bindingResult) {
         bindingResultErrorsCheck(bindingResult);
-        UserDto userDto = userService.join(userJoinRequest);
+        UserDto userDto = userService.createUser(userJoinRequest);
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("회원가입 완료")

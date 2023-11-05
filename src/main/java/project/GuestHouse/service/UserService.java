@@ -1,7 +1,9 @@
 package project.GuestHouse.service;
 
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.GuestHouse.domain.dto.user.UserDto;
@@ -35,7 +37,7 @@ public class UserService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public UserDto join(UserJoinRequest userJoinRequest) {
+    public UserDto createUser(UserJoinRequest userJoinRequest) {
         userRepository.findUserByEmail(userJoinRequest.getEmail())
                 .ifPresent(user -> {
                     throw new GuestException(ErrorCode.DUPLICATED_USER_EMAIL);
