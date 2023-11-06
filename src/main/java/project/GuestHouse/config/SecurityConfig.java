@@ -20,7 +20,6 @@ import project.GuestHouse.service.UserService;
 
 // @EnableWebSecurity 어노테이션을 달아주면 Security가 활성화된다.
 // Security가 활성화되면 회원 가입, 로그인 틀을 만든 Controller가 작동하기 전에 Security가 가로채서 확인
-@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -49,6 +48,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.DELETE,"/**").authenticated()
                 .antMatchers(HttpMethod.PUT,"/**").authenticated()
                 .antMatchers(HttpMethod.GET,"/**").authenticated()
+//                .anyRequest().permitAll() // join, login 허용
                 .and()
 
                 .sessionManagement()
