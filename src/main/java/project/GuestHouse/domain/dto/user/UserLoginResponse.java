@@ -4,9 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@AllArgsConstructor
-@Getter
+@Getter @Setter
 public class UserLoginResponse {
     private String email;
-    private String jwt;
+    private String token;
+
+    public UserLoginResponse(String email, String token) {
+        this.email = email;
+        this.token = token;
+    }
 }
