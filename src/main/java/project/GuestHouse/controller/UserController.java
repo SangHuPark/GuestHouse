@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,15 +24,15 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/join")
+    @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> join(@Valid @RequestBody UserJoinRequest userJoinRequest, BindingResult bindingResult) {
         bindingResultErrorsCheck(bindingResult);
-        UserDto userDto = userService.createUser(userJoinRequest);
+        Long userId = userService.createUser(userJoinRequest);
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("회원가입 완료")
-                .body(new UserJoinResponse(userDto.getEmail(), userDto.getNickname())).build(), HttpStatus.OK);
+                .body("user_id: " + userId).build(), HttpStatus.OK);
         // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
     }
 
@@ -55,7 +56,7 @@ public class UserController {
 
     @GetMapping("/search/all")
     public ResponseEntity<?> searchAllUser() {
-        List<User> users = userService.findAllUser();
+        List<UserSearchResponse> users = userService.findAllUser();
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("전체 회원 조회 완료")
@@ -63,8 +64,8 @@ public class UserController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<?> searchUser(@Valid @RequestBody String email) {
-        User user = userService.findUserByEmail(email);
+    public ResponseEntity<?> searchUser(@RequestBody HashMap<String, String> request) {
+        UserSearchResponse user = userService.findUserByEmail(request.get("email"));
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("회원 조회 완료")
