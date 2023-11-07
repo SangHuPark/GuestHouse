@@ -8,14 +8,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
-import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.service.UserService;
 
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
