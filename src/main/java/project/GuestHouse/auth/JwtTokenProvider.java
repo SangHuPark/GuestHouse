@@ -1,4 +1,4 @@
-package project.GuestHouse.jwt;
+package project.GuestHouse.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -6,7 +6,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -42,21 +44,24 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(exp) // 토큰 만료 시간
-                .signWith(SignatureAlgorithm.HS256, secretKey) // 어떤 암호화 방식으로 사인할지, key로 잠금
+                .signWith(SignatureAlgorithm.HS512, secretKey) // 어떤 암호화 방식으로 사인할지, key로 잠금
                 .compact();
     }
 
-    /*public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailService.loadUserByUsername(this.getUserPk(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
-    public String resolveToken(HttpServletRequest request) {
-        return request.getHeader(HttpHeaders.AUTHORIZATION);
-    }*/
-
     public boolean isExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
+        /*try {
+            Date now = new Date();
+            Date exp = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
+            return now.before(exp);
+        } catch (Exception e) {
+            log.info("error={}", e.getMessage());
+            return false;
+        }*/
+
+//        return extractClaims(token).getExpiration().before(new Date());
+        Date now = new Date();
+        Date exp = extractClaims(token).getExpiration();
+        return now.before(exp);
     }
 
     public String getEmail(String token) {
@@ -66,5 +71,13 @@ public class JwtTokenProvider {
     public Claims extractClaims(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
+
+    //    private final CustomUserDetailService userDetailService;
+
+    // 토큰에서 email 추출
+    /*public Authentication getAuthentication(String token) {
+        UserDetails userDetails = userDetailService.loadUserByUsername(this.getEmail(token));
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }*/
 
 }
