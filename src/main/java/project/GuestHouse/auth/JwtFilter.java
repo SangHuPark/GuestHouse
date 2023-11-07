@@ -1,13 +1,12 @@
-package project.GuestHouse.jwt;
+package project.GuestHouse.auth;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -37,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         logger.info("authorization : " + authorization);
 
         // 토큰이 없거나 Bearer 형태로 보내지 않으면 block
@@ -54,11 +53,11 @@ public class JwtFilter extends OncePerRequestFilter {
         logger.info("token : " + token);
 
         // token Expired 되었는지
-        if (jwtTokenProvider.isExpired(token)) {
-            logger.error("만료된 Token 입니다.");
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if (!jwtTokenProvider.isExpired(token)) {
+//            logger.error("만료된 Token 입니다.");
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         try {
             if (jwtTokenProvider.isExpired(token)) {
@@ -71,7 +70,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                /* Authentication authentication = jwtTokenProvider.getAuthentication(token);
+
+                SecurityContextHolder.getContext().setAuthentication(authentication); */
             }
         } catch (ExpiredJwtException e) {
             request.setAttribute("exception", ErrorCode.TOKEN_EXPIRED_ERROR.name());
