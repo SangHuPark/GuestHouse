@@ -1,16 +1,14 @@
 package project.GuestHouse.service;
 
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.exception.ErrorCode;
 import project.GuestHouse.exception.GuestException;
-import project.GuestHouse.jwt.JwtTokenProvider;
+import project.GuestHouse.auth.JwtTokenProvider;
 import project.GuestHouse.repository.UserRepository;
 
 import java.util.List;
