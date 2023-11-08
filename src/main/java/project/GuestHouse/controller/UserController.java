@@ -62,8 +62,9 @@ public class UserController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<?> searchUser(@RequestBody HashMap<String, String> request) {
-        UserSearchResponse user = userService.findUserByEmail(request.get("email"));
+    public ResponseEntity<?> searchUser(@Valid @RequestBody HashMap<String, String> request) {
+        String email = request.get("email");
+        UserSearchResponse user = userService.findUserByEmail(email);
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("회원 조회 완료")
@@ -71,7 +72,9 @@ public class UserController {
     }
 
     @PatchMapping("/update/password")
-    public ResponseEntity<?> updatePasswordById(@Valid @RequestBody Long id, @Valid @RequestBody String password) {
+    public ResponseEntity<?> updatePasswordById(@Valid @RequestBody HashMap<String, String> request) {
+        Long id = Long.valueOf(request.get("id"));
+        String password = request.get("password");
         userService.updateUserPassword(id, password);
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
