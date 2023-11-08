@@ -67,7 +67,7 @@ public class UserService {
         Optional<User> result = userRepository.findById(id);
         // null 이 아니면 get()의 결과가 넘어온다.
         User user = result.orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
-        user.updatePassword(password);
+        user.updatePassword(encoder.encode(password));
         userRepository.save(user);
         return true;
     }
