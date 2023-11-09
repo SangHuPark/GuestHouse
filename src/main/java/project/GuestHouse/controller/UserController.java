@@ -34,6 +34,14 @@ public class UserController {
         // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
     }
 
+    @PostMapping("/mail/send")
+    public ResponseEntity<?> mailSend() {
+        return new ResponseEntity<>(Response.builder()
+                .isSuccess(true)
+                .message("이메일 전송 성공")
+                .body("user_email: ").build(), HttpStatus.OK);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest userLoginRequest, BindingResult bindingResult) {
         try {
