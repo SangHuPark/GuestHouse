@@ -41,7 +41,8 @@ public class UserController {
     @PostMapping("/mail/confirm")
     public ResponseEntity<?> mailConfirm(@Valid @RequestBody HashMap<String, String> request) {
         String email = request.get("email");
-        Boolean result = userService.duplicateEmail(email);
+        Boolean result = userService.duplicateUserByEmail(email);
+
         if (result) {
             return new ResponseEntity<>(Response.builder()
                     .isSuccess(true)
