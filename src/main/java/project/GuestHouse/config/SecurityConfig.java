@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .and()
 
                 .authorizeHttpRequests()
-                .antMatchers("/api/users/signup", "/api/users/login").permitAll() // join, login 허용
+                .antMatchers("/api/users/signup", "/api/users/login", "/api/users/mail/**", "/api/users/code/**").permitAll() // join, login 허용
                 .antMatchers(HttpMethod.POST,"/**").authenticated()
                 .antMatchers(HttpMethod.DELETE,"/**").authenticated()
                 .antMatchers(HttpMethod.PUT,"/**").authenticated()
