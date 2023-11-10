@@ -1,6 +1,7 @@
 package project.GuestHouse.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -8,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
+import project.GuestHouse.service.EmailService;
 import project.GuestHouse.service.UserService;
 
 import javax.validation.Valid;
@@ -16,11 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+    private final EmailService emailService;
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -34,12 +38,51 @@ public class UserController {
         // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
     }
 
+    @PostMapping("/mail/confirm")
+    public ResponseEntity<?> mailConfirm(@Valid @RequestBody HashMap<String, String> request) {
+        String email = request.get("email");
+        Boolean result = userService.duplicateEmail(email);
+        if (result) {
+            return new ResponseEntity<>(Response.builder()
+                    .isSuccess(true)
+                    .message("사용 가능한 이메일 입니다.")
+                    .body("user_email: " + email).build(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Response.builder()
+                    .isSuccess(false)
+                    .message("이미 사용 중인 이메일 입니다.")
+                    .body("user_email: " + email).build(), HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
     @PostMapping("/mail/send")
-    public ResponseEntity<?> mailSend() {
+    public ResponseEntity<?> mailSend(@Valid @RequestBody HashMap<String, String> request) throws Exception {
+        String email = request.get("email");
+        String code = emailService.sendSimpleMessage(email);
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
-                .message("이메일 전송 성공")
-                .body("user_email: ").build(), HttpStatus.OK);
+                .message("인증번호 전송 성공")
+                .body("confirm_code: " + code).build(), HttpStatus.OK);
+    }
+
+    @PostMapping("/code/confirm")
+    public ResponseEntity<?> codeConfirm(@Valid @RequestBody HashMap<String, String> request) throws Exception {
+        String key = request.get("email");
+        String code = request.get("code");
+        Boolean confirmEmail = emailService.verifyEmail(key, code);
+
+        if (confirmEmail) {
+            emailService.deleteEmail(key);
+            return new ResponseEntity<>(Response.builder()
+                    .isSuccess(true)
+                    .message("인증번호가 일치합니다.")
+                    .body(key).build(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Response.builder()
+                    .isSuccess(false)
+                    .message("인증번호가 일치하지 않습니다.")
+                    .body(key).build(), HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PostMapping("/login")
