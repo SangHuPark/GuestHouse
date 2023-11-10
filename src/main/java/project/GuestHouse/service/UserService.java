@@ -24,11 +24,6 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public Long createUser(UserJoinRequest userJoinRequest) {
-        userRepository.findByEmail(userJoinRequest.getEmail())
-                .ifPresent(user -> {
-                    throw new GuestException(ErrorCode.DUPLICATED_USER_EMAIL);
-                });
-
         User savedUser = userRepository.save(userJoinRequest.toEntity(encoder.encode(userJoinRequest.getPassword())));
 
         return savedUser.getId();
@@ -63,19 +58,29 @@ public class UserService {
         return new UserSearchResponse(user);
     }
 
+    public Boolean duplicateUserByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean updateUserPassword(Long id, String password) {
-        Optional<User> result = userRepository.findById(id);
         // null 이 아니면 get()의 결과가 넘어온다.
-        User user = result.orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
         user.updatePassword(encoder.encode(password));
         userRepository.save(user);
         return true;
     }
 
     public boolean deleteUser(Long id) {
-        Optional<User> result = userRepository.findById(id);
-        User user = result.orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
+        User user = userRepository.findById(id).orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
         userRepository.delete(user);
         return true;
     }
+
 }
