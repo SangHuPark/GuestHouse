@@ -56,7 +56,7 @@ public class EmailService {
         return message;
     }
 
-    // 인증코드 만들기
+    // 인증코드 생성
     public static String createCode() {
         StringBuffer code = new StringBuffer();
         Random rnd = new Random();
