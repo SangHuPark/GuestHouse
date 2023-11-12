@@ -68,6 +68,7 @@ public class EmailService {
         return code.toString();
     }
 
+
     /*
         메일 발송
         sendSimpleMessage의 매개변수로 들어온 to는 인증번호를 받을 메일주소
