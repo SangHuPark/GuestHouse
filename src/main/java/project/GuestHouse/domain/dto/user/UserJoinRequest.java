@@ -2,6 +2,7 @@ package project.GuestHouse.domain.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 import project.GuestHouse.domain.entity.ProviderType;
 import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.domain.entity.UserType;
@@ -27,10 +28,10 @@ public class UserJoinRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDate birth;
 
-    @NotBlank(message = "올바른 형식의 닉네임이 아닙니다.")
+    /*@NotBlank(message = "올바른 형식의 닉네임이 아닙니다.")
     @Size(min = 2, max = 10, message = "닉네임의 길이는 2자 이상 10자 이하로 입력하세요.")
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,10}$", message = "닉네임은 특수문자를 제외한 2~10 자리여야 합니다.")
-    private String nickname;
+    private String nickname;*/
 
     private String phoneNum;
 
@@ -40,7 +41,6 @@ public class UserJoinRequest {
                 .password(password)
                 .userName(this.userName)
                 .birth(this.birth)
-                .nickname(this.nickname)
                 .phoneNum(this.phoneNum)
                 .provider(ProviderType.LOCAL) // default = LOCAL
                 .userType(UserType.NORMAL) // default = NORMAL
