@@ -12,7 +12,6 @@ public class UserSearchResponse {
     private String email;
     private String userName;
     private LocalDate birth;
-    private String nickname;
     private String phoneNum;
 
     public UserSearchResponse(User user) {
@@ -20,7 +19,6 @@ public class UserSearchResponse {
         email = user.getEmail();
         userName = user.getUserName();
         birth = user.getBirth();
-        nickname = user.getNickname();
         phoneNum = user.getPhoneNum();
     }
 }
