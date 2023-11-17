@@ -1,13 +1,9 @@
 package project.GuestHouse.domain.entity;
 
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-import project.GuestHouse.domain.dto.user.UserDto;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -33,8 +29,8 @@ public class User extends BaseEntity {
     @Column(name = "birth", nullable = false)
     private LocalDate birth;
 
-    @Column(name = "nickname", unique = true, nullable = false)
-    private String nickname;
+    @Column(name = "profile_img", unique = true, nullable = true)
+    private String profileImg;
 
     @Column(name = "phone_num", unique = true, nullable = false)
     private String phoneNum;
@@ -51,15 +47,12 @@ public class User extends BaseEntity {
     @JoinColumn(name = "social_uuid")
     private Social social;
 
-    public UserDto toDto() {
-        return UserDto.builder()
-                .email(this.email)
-                .nickname(this.nickname)
-                .build();
-    }
-
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void setProfileImg(String profileImg) {
+        this.profileImg = profileImg;
     }
 
 }
