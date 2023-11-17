@@ -3,16 +3,20 @@ package project.GuestHouse.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.service.EmailService;
+import project.GuestHouse.service.S3Service;
 import project.GuestHouse.service.UserService;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +28,14 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final S3Service s3Service;
     private final EmailService emailService;
 
-    @PostMapping("/signup")
+    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> join(@Valid @RequestBody UserJoinRequest userJoinRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> join(@Valid @RequestParam("profileImg") MultipartFile profileImg, @Valid @RequestBody UserJoinRequest userJoinRequest, BindingResult bindingResult) throws IOException {
         bindingResultErrorsCheck(bindingResult);
+        String profileImgUrl = s3Service.saveImage(profileImg);
         Long userId = userService.createUser(userJoinRequest);
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
