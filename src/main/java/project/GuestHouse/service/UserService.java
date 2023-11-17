@@ -61,26 +61,20 @@ public class UserService {
     public Boolean duplicateUserByEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
 
-        if (user.isEmpty()) {
-            return true;
-        } else {
-            return false;
-        }
+        return user.isEmpty();
     }
 
-    public boolean updateUserPassword(Long id, String password) {
+    public void updateUserPassword(Long id, String password) {
         // null 이 아니면 get()의 결과가 넘어온다.
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
         user.updatePassword(encoder.encode(password));
         userRepository.save(user);
-        return true;
     }
 
-    public boolean deleteUser(Long id) {
+    public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
-        userRepository.delete(user);
-        return true;
+        user.delete();
     }
 
 }
