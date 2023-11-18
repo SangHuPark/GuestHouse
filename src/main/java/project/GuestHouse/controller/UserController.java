@@ -44,6 +44,7 @@ public class UserController {
         // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
     }
 
+
     @PostMapping("/mail/confirm")
     public ResponseEntity<?> mailConfirm(@Valid @RequestBody HashMap<String, String> request) {
         String email = request.get("email");
