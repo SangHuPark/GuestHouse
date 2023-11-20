@@ -3,6 +3,7 @@ package project.GuestHouse.domain.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Entity
@@ -26,10 +27,11 @@ public class User extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String userName;
 
-    @Column(name = "birth", nullable = false)
+    @Column(name = "birth", nullable = true)
     private LocalDate birth;
 
     @Column(name = "profile_img", unique = true, nullable = true)
+    @Size(max = 300)
     private String profileImg;
 
     @Column(name = "phone_num", unique = true, nullable = false)
@@ -51,7 +53,7 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    public void setProfileImg(String profileImg) {
+    public void updateProfileImg(String profileImg) {
         this.profileImg = profileImg;
     }
 
