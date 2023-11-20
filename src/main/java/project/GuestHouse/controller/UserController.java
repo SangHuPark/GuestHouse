@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-정import project.GuestHouse.domain.dto.Response;
+import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.service.EmailService;
 import project.GuestHouse.service.S3Service;
