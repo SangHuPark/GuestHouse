@@ -11,6 +11,9 @@ import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.auth.JwtTokenProvider;
 import project.GuestHouse.repository.UserRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,10 +26,13 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public Long createUser(UserJoinRequest userJoinRequest) {
-        User savedUser = userRepository.save(userJoinRequest.toEntity(encoder.encode(userJoinRequest.getPassword())));
-
-        return savedUser.getId();
+    public void createUser(UserJoinRequest userJoinRequest, String imageUrl) {
+        LocalDate birth = LocalDate.parse(userJoinRequest.getBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        userRepository.save(
+                userJoinRequest.toEntity(
+                        encoder.encode(userJoinRequest.getPassword()),
+                        imageUrl,
+                        birth));
     }
 
     public UserLoginResponse login(UserLoginRequest userLoginRequest) {
