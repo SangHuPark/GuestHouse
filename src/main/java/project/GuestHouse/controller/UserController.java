@@ -8,8 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import project.GuestHouse.domain.dto.Response;
+정import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.service.EmailService;
 import project.GuestHouse.service.S3Service;
@@ -33,14 +32,16 @@ public class UserController {
 
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> join(@Valid @RequestParam("profileImg") MultipartFile profileImg, @Valid @RequestBody UserJoinRequest userJoinRequest, BindingResult bindingResult) throws IOException {
+    public ResponseEntity<?> join(@Valid @ModelAttribute UserJoinRequest userJoinRequest, BindingResult bindingResult) throws IOException {
         bindingResultErrorsCheck(bindingResult);
-        String profileImgUrl = s3Service.saveImage(profileImg);
-        Long userId = userService.createUser(userJoinRequest);
+        String email = userJoinRequest.getEmail().substring(0, userJoinRequest.getEmail().indexOf("@"));
+        String imageUrl = s3Service.saveImage(userJoinRequest.getProfileImg(), email);
+
+        userService.createUser(userJoinRequest, imageUrl);
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("회원가입 완료")
-                .body("user_id: " + userId).build(), HttpStatus.OK);
+                .body("image_url: " + imageUrl).build(), HttpStatus.OK);
         // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
     }
 
