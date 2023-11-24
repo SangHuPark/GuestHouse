@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
+import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.service.EmailService;
 import project.GuestHouse.service.S3Service;
 import project.GuestHouse.service.UserService;
@@ -34,10 +35,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> join(@Valid @ModelAttribute UserJoinRequest userJoinRequest, BindingResult bindingResult) throws IOException {
         bindingResultErrorsCheck(bindingResult);
-        String email = userJoinRequest.getEmail().substring(0, userJoinRequest.getEmail().indexOf("@"));
-        String imageUrl = s3Service.saveImage(userJoinRequest.getProfileImg(), email);
 
-        userService.createUser(userJoinRequest, imageUrl);
+        User user = userService.createUser(userJoinRequest);
+        String imageUrl = s3Service.saveImage(userJoinRequest.getProfileImg(), user);
+
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("회원가입 완료")
