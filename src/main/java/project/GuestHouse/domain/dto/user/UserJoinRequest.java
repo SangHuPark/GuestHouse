@@ -26,25 +26,25 @@ public class UserJoinRequest {
     @Size(min = 2, message = "이름은 2자 이상 입력하세요.")
     private String userName;
 
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    private String birth;
-
     @NotBlank(message = "올바른 형식의 닉네임이 아닙니다.")
     @Size(min = 2, max = 10, message = "닉네임의 길이는 2자 이상 10자 이하로 입력하세요.")
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,10}$", message = "닉네임은 특수문자를 제외한 2~10 자리여야 합니다.")
-    private String nickname;
+    private String userNickname;
+
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    private String birth;
 
     private MultipartFile profileImg;
 
     private String phoneNum;
 
-    public User toEntity(String password, String profileImg, LocalDate birth) {
+    public User toEntity(String password, LocalDate birth) {
         return User.builder()
                 .email(this.email)
                 .password(password)
                 .userName(this.userName)
+                .userNickname(this.userNickname)
                 .birth(birth)
-                .profileImg(profileImg)
                 .phoneNum(this.phoneNum)
                 .provider(ProviderType.LOCAL) // default = LOCAL
                 .userType(UserType.NORMAL) // default = NORMAL
