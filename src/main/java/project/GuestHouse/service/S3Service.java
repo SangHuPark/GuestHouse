@@ -7,14 +7,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import project.GuestHouse.domain.entity.Image;
+import project.GuestHouse.domain.entity.User;
+import project.GuestHouse.repository.ImageRepository;
 import project.GuestHouse.repository.UserRepository;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -22,39 +25,60 @@ import java.util.List;
 public class S3Service {
 
     private final AmazonS3 amazonS3;
+    private final ImageRepository imageRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String saveImages(List<MultipartFile> MultipartFiles, String imgName) throws IOException {
+    public String saveImages(List<MultipartFile> MultipartFiles, User user) throws IOException {
         List<String> imageList = new ArrayList<>();
-        imgName = imgName + "Post";
 
-        for(MultipartFile multipartFile : MultipartFiles) {
-            String value = saveImage(multipartFile, imgName);
+        for (MultipartFile multipartFile : MultipartFiles) {
+            String value = saveImage(multipartFile, user);
             imageList.add(value);
         }
 
         return imageList.toString();
     }
 
-    public String saveImage(MultipartFile multipartFile, String imgName) throws IOException {
-        String fileName = generateFileName(imgName);
-        log.info("fileName: " + fileName);
+    public String saveImage(MultipartFile multipartFile, User user) {
+        String originalName = multipartFile.getOriginalFilename();
+        Image image = new Image(originalName);
+        String filename = generateFileName(originalName);
 
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(multipartFile.getContentType());
-        objectMetadata.setContentLength(multipartFile.getInputStream().available());
+        image.setStoredName(filename);
+        image.setUser(user);
+        log.info("fileName: " + filename);
 
-        amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), objectMetadata);
+        try {
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentType(multipartFile.getContentType());
+            objectMetadata.setContentLength(multipartFile.getInputStream().available());
 
-        String accessUrl = amazonS3.getUrl(bucket, fileName).toString();
-        return accessUrl;
+            amazonS3.putObject(bucket, filename, multipartFile.getInputStream(), objectMetadata);
+
+            String accessUrl = amazonS3.getUrl(bucket, filename).toString();
+            image.setAccessUrl(accessUrl);
+        } catch (IOException e) {
+
+        }
+
+        imageRepository.save(image);
+
+        return image.getAccessUrl();
     }
 
-    private String generateFileName(String imgName) {
-        String fileName = LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "-" + imgName;
-        return fileName;
+    // 이미지 파일의 이름을 저장하기 위한 이름으로 변환하는 메소드
+    private String generateFileName(String originName) {
+        // LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        return UUID.randomUUID() + extractExtension(originName);
+    }
+
+    // 이미지 파일 확장자 추출 메소드
+    public String extractExtension(String originName) {
+        int index = originName.lastIndexOf('.');
+
+        return originName.substring(index, originName.length());
     }
 
 }
