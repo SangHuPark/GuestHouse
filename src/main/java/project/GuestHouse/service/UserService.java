@@ -9,6 +9,7 @@ import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.exception.ErrorCode;
 import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.auth.JwtTokenProvider;
+import project.GuestHouse.repository.ImageRepository;
 import project.GuestHouse.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -26,13 +27,13 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public void createUser(UserJoinRequest userJoinRequest, String imageUrl) {
+    public User createUser(UserJoinRequest userJoinRequest) {
         LocalDate birth = LocalDate.parse(userJoinRequest.getBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        userRepository.save(
+        User user = userRepository.save(
                 userJoinRequest.toEntity(
                         encoder.encode(userJoinRequest.getPassword()),
-                        imageUrl,
                         birth));
+        return user;
     }
 
     public UserLoginResponse login(UserLoginRequest userLoginRequest) {
