@@ -27,12 +27,15 @@ public class User extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String userName;
 
+    @Column(name = "nickname", nullable = false)
+    private String userNickname;
+
     @Column(name = "birth", nullable = true)
     private LocalDate birth;
 
-    @Column(name = "profile_img", unique = true, nullable = true)
-    @Size(max = 300)
-    private String profileImg;
+//    @Column(name = "profile_img", unique = true, nullable = true)
+//    @Size(max = 300)
+//    private String profileImg;
 
     @Column(name = "phone_num", unique = true, nullable = false)
     private String phoneNum;
@@ -49,12 +52,11 @@ public class User extends BaseEntity {
     @JoinColumn(name = "social_uuid")
     private Social social;
 
+    @OneToOne(mappedBy = "user")
+    private Image image;
+
     public void updatePassword(String password) {
         this.password = password;
-    }
-
-    public void updateProfileImg(String profileImg) {
-        this.profileImg = profileImg;
     }
 
 }
