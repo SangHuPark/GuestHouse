@@ -7,18 +7,16 @@ import javax.persistence.*;
 
 @Entity
 @Getter @Setter
-@Table(name = "Social")
+@Table(name = "social")
 public class Social {
 
     @Id
-    @Column(name = "uuid")
+    @Column(name = "social_uuid")
     private String uuid;
 
     @OneToOne(mappedBy = "social")
+    @JoinColumn(name = "user_id")
     private User user;
-
-    @Column(name = "user_uuid", unique = true, nullable = false)
-    private String userUuid;
 
     @Column(name = "identifier")
     private String identifier;

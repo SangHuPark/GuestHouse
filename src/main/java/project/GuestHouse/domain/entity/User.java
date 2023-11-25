@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Getter @Setter
+@Table(name = "user")
 public class User extends BaseEntity {
 
     @Id
@@ -24,10 +25,10 @@ public class User extends BaseEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "user_name", nullable = false)
     private String userName;
 
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "user_nickname", nullable = false)
     private String userNickname;
 
     @Column(name = "birth", nullable = true)
@@ -42,11 +43,11 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false)
-    private ProviderType provider = ProviderType.LOCAL;
+    private ProviderType provider;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
-    private UserType userType = UserType.NORMAL;
+    private UserType userType;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "social_uuid")

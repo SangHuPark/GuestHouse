@@ -9,6 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Getter @Setter
+@Table(name = "image")
 public class Image {
 
     @Id
