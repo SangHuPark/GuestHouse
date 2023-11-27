@@ -74,7 +74,7 @@ public class UserController {
                 .body("confirm_code: " + code).build(), HttpStatus.OK);
     }
 
-    @PostMapping("/code/confirm")
+    @PostMapping("/mail/code")
     public ResponseEntity<?> codeConfirm(@Valid @RequestBody HashMap<String, String> request) throws Exception {
         String key = request.get("email");
         String code = request.get("code");
@@ -139,7 +139,7 @@ public class UserController {
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("비밀번호 변경 완료")
-                .body(password).build(), HttpStatus.OK);
+                .body("updated_pw = " + password).build(), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
