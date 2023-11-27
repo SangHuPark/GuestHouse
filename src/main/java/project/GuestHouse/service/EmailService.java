@@ -90,14 +90,13 @@ public class EmailService {
 
     public Boolean verifyEmail(String key, String code) throws ChangeSetPersister.NotFoundException {
         String correctCode = redisUtil.getData(key);
+        log.info("correctCode = " + correctCode);
 
         if (correctCode == null) {
-            throw new ChangeSetPersister.NotFoundException();
-        } else if (correctCode.equals(code)) {
-            return true;
+            return false;
+        } else {
+            return correctCode.equals(code);
         }
-
-        return false;
     }
 
     public void deleteEmail(String key) {
