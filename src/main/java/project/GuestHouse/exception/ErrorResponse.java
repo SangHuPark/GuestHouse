@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Getter
 public class ErrorResponse {
 
-    private final boolean success = false;
+    private final boolean isSuccess = false;
     private final HttpStatus httpStatus;
     private final int code;
     private final String message;
