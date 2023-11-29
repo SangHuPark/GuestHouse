@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import project.GuestHouse.domain.dto.Response;
 import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.domain.entity.User;
+import project.GuestHouse.exception.ErrorCode;
+import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.service.EmailService;
 import project.GuestHouse.service.S3Service;
 import project.GuestHouse.service.UserService;
@@ -33,11 +35,14 @@ public class UserController {
 
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> join(@Valid @ModelAttribute UserJoinRequest userJoinRequest, BindingResult bindingResult) throws IOException {
+    public ResponseEntity<?> join(@ModelAttribute @Valid UserJoinRequest userJoinRequest, BindingResult bindingResult) throws IOException {
         bindingResultErrorsCheck(bindingResult);
 
         User user = userService.createUser(userJoinRequest);
-        String imageUrl = s3Service.saveImage(userJoinRequest.getProfileImg(), user);
+
+        String imageUrl = "https://invitbucket.s3.ap-northeast-2.amazonaws.com/defaultUserProfileImage.svg";
+        if (!userJoinRequest.getProfileImg().isEmpty())
+            imageUrl = s3Service.saveImage(userJoinRequest.getProfileImg(), user);
 
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
@@ -150,13 +155,17 @@ public class UserController {
                 .message("회원 탈퇴 완료").build(), HttpStatus.OK);
     }
 
-    private void bindingResultErrorsCheck(BindingResult bindingResult) {
+    private ResponseEntity<?> bindingResultErrorsCheck(BindingResult bindingResult) {
+        Map<String, String> errorMap = new HashMap<>();
         if (bindingResult.hasErrors()) {
-            Map<String, String> errorMap = new HashMap<>();
             for (FieldError fe : bindingResult.getFieldErrors()) {
                 errorMap.put(fe.getField(), fe.getDefaultMessage());
             }
-            throw new RuntimeException(errorMap.toString());
+//            throw new GuestException(ErrorCode.INTERNAL_SERVER_ERROR, errorMap.toString());
         }
+        return new ResponseEntity<>(Response.builder()
+                .isSuccess(false)
+                .message("Internal Server Error")
+                .body("error = " + errorMap.toString()).build(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
