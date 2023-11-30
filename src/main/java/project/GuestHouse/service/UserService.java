@@ -28,11 +28,12 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public User createUser(UserJoinRequest userJoinRequest) {
-        LocalDate birth = LocalDate.parse(userJoinRequest.getBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        //        LocalDate birth = LocalDate.parse(userJoinRequest.getBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDate birth = LocalDate.parse("2000-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         User user = userRepository.save(
-                userJoinRequest.toEntity(
-                        encoder.encode(userJoinRequest.getPassword()),
-                        birth));
+            userJoinRequest.toEntity(
+                    encoder.encode(userJoinRequest.getPassword()),
+                    birth));
         return user;
     }
 
@@ -80,7 +81,8 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
         user.delete();
     }
 
