@@ -41,7 +41,7 @@ public class UserController {
         User user = userService.createUser(userJoinRequest);
 
         String imageUrl = "https://invitbucket.s3.ap-northeast-2.amazonaws.com/defaultUserProfileImage.svg";
-        if (!userJoinRequest.getProfileImg().isEmpty())
+        if (userJoinRequest.getProfileImg() != null)
             imageUrl = s3Service.saveImage(userJoinRequest.getProfileImg(), user);
 
         return new ResponseEntity<>(Response.builder()
