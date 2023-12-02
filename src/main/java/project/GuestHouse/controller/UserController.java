@@ -44,6 +44,7 @@ public class UserController {
         if (userJoinRequest.getProfileImg() != null)
             imageUrl = s3Service.saveImage(userJoinRequest.getProfileImg(), user);
 
+
         return new ResponseEntity<>(Response.builder()
                 .isSuccess(true)
                 .message("회원가입 완료")
