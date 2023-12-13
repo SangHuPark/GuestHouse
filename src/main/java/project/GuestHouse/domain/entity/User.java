@@ -48,11 +48,12 @@ public class User extends BaseEntity {
     @Column(name = "user_type", nullable = false)
     private UserType userType;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JoinColumn(name = "social_uuid")
     private Social social;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id")
     private Image image;
 
     public void updatePassword(String password) {
