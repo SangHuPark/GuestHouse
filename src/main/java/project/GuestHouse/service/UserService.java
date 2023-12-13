@@ -30,6 +30,10 @@ public class UserService {
     public User createUser(UserJoinRequest userJoinRequest) {
         //        LocalDate birth = LocalDate.parse(userJoinRequest.getBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate birth = LocalDate.parse("2000-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        if(!userRepository.findByPhoneNum(userJoinRequest.getPhoneNum()))
+            throw new GuestException(ErrorCode.DUPLICATED_USER_PHONENUM);
+
         User user = userRepository.save(
             userJoinRequest.toEntity(
                     encoder.encode(userJoinRequest.getPassword()),

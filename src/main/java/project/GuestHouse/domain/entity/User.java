@@ -18,16 +18,16 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "user_email", nullable = false, unique = true)
+    @Column(name = "user_email", nullable = false, unique = true, length = 45)
     private String email;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "user_name", nullable = false)
+    @Column(name = "user_name", nullable = false, length = 20)
     private String userName;
 
-    @Column(name = "user_nickname", nullable = false)
+    @Column(name = "user_nickname", nullable = false, length = 20)
     private String userNickname;
 
     @Column(name = "birth", nullable = true)
@@ -37,22 +37,23 @@ public class User extends BaseEntity {
 //    @Size(max = 300)
 //    private String profileImg;
 
-    @Column(name = "phone_num", unique = true, nullable = false)
+    @Column(name = "phone_num", unique = true, nullable = false, length = 15)
     private String phoneNum;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "provider", nullable = false)
+    @Column(name = "provider", nullable = false, length = 15)
     private ProviderType provider;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
     private UserType userType;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JoinColumn(name = "social_uuid")
     private Social social;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id")
     private Image image;
 
     public void updatePassword(String password) {

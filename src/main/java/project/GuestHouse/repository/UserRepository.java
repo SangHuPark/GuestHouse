@@ -12,4 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // 사용자 pk 로 조회
     Optional<User> findById(Long id);
+
+    // 사용자 전화번호 로 조회
+    Boolean findByPhoneNum(String phoneNum);
 }
