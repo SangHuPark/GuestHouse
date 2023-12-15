@@ -14,7 +14,7 @@ public class Social {
     @Column(name = "social_uuid")
     private String uuid;
 
-    @OneToOne(mappedBy = "social")
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
