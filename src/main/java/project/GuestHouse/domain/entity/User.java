@@ -44,17 +44,13 @@ public class User extends BaseEntity {
     @Column(name = "provider", nullable = false, length = 15)
     private ProviderType provider;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "user_type", nullable = false)
-    private UserType userType;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JoinColumn(name = "social_uuid")
     private Social social;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
-    private Image image;
+    private UserImage userImage;
 
     public void updatePassword(String password) {
         this.password = password;
