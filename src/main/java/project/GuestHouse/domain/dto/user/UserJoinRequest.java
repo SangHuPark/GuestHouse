@@ -4,7 +4,6 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.GuestHouse.domain.entity.ProviderType;
 import project.GuestHouse.domain.entity.User;
-import project.GuestHouse.domain.entity.UserType;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -50,7 +49,6 @@ public class UserJoinRequest {
                 .birth(birth)
                 .phoneNum(this.phoneNum)
                 .provider(ProviderType.LOCAL) // default = LOCAL
-                .userType(UserType.NORMAL) // default = NORMAL
                 .build();
     }
     /*
