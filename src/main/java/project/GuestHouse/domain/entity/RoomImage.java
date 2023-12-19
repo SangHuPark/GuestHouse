@@ -7,8 +7,8 @@
 //
 //@Entity
 //@Getter @Setter
-//@Table(name = "accommodation_image")
-//public class AccommodationImage {
+//@Table(name = "room_image")
+//public class RoomImage {
 //
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +24,5 @@
 //    @Column(name = "access_url")
 //    private String accessUrl; // S3 URL
 //
-//    @ManyToOne
-//    @JoinColumn(name = "accommodation_id")
-//    private Accommodation accommodation;
 //
 //}
