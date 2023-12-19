@@ -9,8 +9,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Getter @Setter
-@Table(name = "image")
-public class Image {
+@Table(name = "user_image")
+public class UserImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class Image {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Image(String originName) {
+    public UserImage(String originName) {
         this.originName = originName;
         this.storedName = "";
         this.accessUrl = "";

@@ -14,11 +14,11 @@ public class Social {
     @Column(name = "social_uuid")
     private String uuid;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @Column(name = "identifier")
     private String identifier;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

@@ -7,14 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import project.GuestHouse.domain.entity.Image;
+import project.GuestHouse.domain.entity.UserImage;
 import project.GuestHouse.domain.entity.User;
-import project.GuestHouse.repository.ImageRepository;
-import project.GuestHouse.repository.UserRepository;
+import project.GuestHouse.repository.UserImageRepository;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +22,7 @@ import java.util.UUID;
 public class S3Service {
 
     private final AmazonS3 amazonS3;
-    private final ImageRepository imageRepository;
+    private final UserImageRepository userImageRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -43,11 +40,11 @@ public class S3Service {
 
     public String saveImage(MultipartFile multipartFile, User user) {
         String originalName = multipartFile.getOriginalFilename();
-        Image image = new Image(originalName);
+        UserImage userImage = new UserImage(originalName);
         String filename = generateFileName(originalName);
 
-        image.setStoredName(filename);
-        image.setUser(user);
+        userImage.setStoredName(filename);
+        userImage.setUser(user);
         log.info("fileName: " + filename);
 
         try {
@@ -58,14 +55,14 @@ public class S3Service {
             amazonS3.putObject(bucket, filename, multipartFile.getInputStream(), objectMetadata);
 
             String accessUrl = amazonS3.getUrl(bucket, filename).toString();
-            image.setAccessUrl(accessUrl);
+            userImage.setAccessUrl(accessUrl);
         } catch (IOException e) {
 
         }
 
-        imageRepository.save(image);
+        userImageRepository.save(userImage);
 
-        return image.getAccessUrl();
+        return userImage.getAccessUrl();
     }
 
     // 이미지 파일의 이름을 저장하기 위한 이름으로 변환하는 메소드

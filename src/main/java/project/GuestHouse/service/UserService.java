@@ -9,10 +9,8 @@ import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.exception.ErrorCode;
 import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.auth.JwtTokenProvider;
-import project.GuestHouse.repository.ImageRepository;
 import project.GuestHouse.repository.UserRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,13 +29,14 @@ public class UserService {
         //        LocalDate birth = LocalDate.parse(userJoinRequest.getBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate birth = LocalDate.parse("2000-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        if(!userRepository.findByPhoneNum(userJoinRequest.getPhoneNum()))
+        if(userRepository.findByPhoneNum(userJoinRequest.getPhoneNum()) != null)
             throw new GuestException(ErrorCode.DUPLICATED_USER_PHONENUM);
 
         User user = userRepository.save(
             userJoinRequest.toEntity(
                     encoder.encode(userJoinRequest.getPassword()),
                     birth));
+
         return user;
     }
 
