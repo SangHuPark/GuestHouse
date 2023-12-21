@@ -34,19 +34,30 @@ public class UserController {
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> join(@ModelAttribute @Valid UserJoinRequest userJoinRequest, BindingResult bindingResult) throws IOException {
-        bindingResultErrorsCheck(bindingResult);
 
-        User user = userService.createUser(userJoinRequest);
+        try {
+            bindingResultErrorsCheck(bindingResult);
 
-        String imageUrl = "https://invitbucket.s3.ap-northeast-2.amazonaws.com/defaultUserProfileImage.svg";
-        if (userJoinRequest.getProfileImg() != null)
-            imageUrl = s3Service.saveImage(userJoinRequest.getProfileImg(), user);
+            UserJoinResponse userJoinResponse = userService.createUser(userJoinRequest);
 
-        return new ResponseEntity<>(Response.builder()
-                .isSuccess(true)
-                .message("회원가입 완료")
-                .body("image_url: " + imageUrl).build(), HttpStatus.OK);
-        // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
+            if (userJoinRequest.getProfileImg() != null)
+                userJoinResponse.setImageUrl(s3Service.saveImage(userJoinRequest.getProfileImg(), userJoinResponse.getEmail()));
+            else
+                userJoinResponse.setImageUrl("https://invitbucket.s3.ap-northeast-2.amazonaws.com/defaultUserProfileImage.svg");
+
+            // userJoinResponse 만들기
+            return new ResponseEntity<>(Response.builder()
+                    .isSuccess(true)
+                    .message("회원가입 완료")
+                    .body(userJoinResponse).build(), HttpStatus.OK);
+            // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
+        } catch (Exception e) {
+            return new ResponseEntity<>(Response.builder()
+                    .isSuccess(false)
+                    .message("회원가입 실패")
+                    .body(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @PostMapping("/mail/confirm")
