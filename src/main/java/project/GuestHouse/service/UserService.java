@@ -6,9 +6,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.domain.entity.User;
+import project.GuestHouse.domain.entity.UserImage;
 import project.GuestHouse.exception.ErrorCode;
 import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.auth.JwtTokenProvider;
+import project.GuestHouse.repository.UserImageRepository;
 import project.GuestHouse.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -22,22 +24,25 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserImageRepository userImageRepository;
     private final BCryptPasswordEncoder encoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public User createUser(UserJoinRequest userJoinRequest) {
+    public UserJoinResponse createUser(UserJoinRequest userJoinRequest) {
         //        LocalDate birth = LocalDate.parse(userJoinRequest.getBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate birth = LocalDate.parse("2000-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         if(userRepository.findByPhoneNum(userJoinRequest.getPhoneNum()) != null)
             throw new GuestException(ErrorCode.DUPLICATED_USER_PHONENUM);
 
-        User user = userRepository.save(
+        userRepository.save(
             userJoinRequest.toEntity(
                     encoder.encode(userJoinRequest.getPassword()),
                     birth));
 
-        return user;
+        String imageUrl = "https://invitbucket.s3.ap-northeast-2.amazonaws.com/defaultUserProfileImage.svg";
+
+        return new UserJoinResponse(userJoinRequest.getEmail(), userJoinRequest.getPassword(), imageUrl);
     }
 
     public UserLoginResponse login(UserLoginRequest userLoginRequest) {
@@ -46,13 +51,20 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GuestException(ErrorCode.USER_EMAIL_NOT_FOUND));
 
+        String imageUrl = "https://invitbucket.s3.ap-northeast-2.amazonaws.com/defaultUserProfileImage.svg";
+
+        if (userImageRepository.findByUserId(user.getId()).isPresent()) {
+            Optional<UserImage> userImage = userImageRepository.findByUserId(user.getId());
+            imageUrl = userImage.get().getAccessUrl();
+        }
+
         if (!encoder.matches(userLoginRequest.getPassword(), user.getPassword())) {
             throw new GuestException(ErrorCode.INVALID_PASSWORD);
         }
 
         String token = jwtTokenProvider.createToken(user.getEmail());
 
-        return new UserLoginResponse(email, token);
+        return new UserLoginResponse(email, token, imageUrl);
     }
 
     public List<UserSearchResponse> findAllUser() {

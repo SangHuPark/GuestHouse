@@ -36,7 +36,7 @@ public class JwtTokenProvider {
         // Jwts 클래스에서 제공하는 일종의 Map 자료구조
         claims.put("email", email);
 
-        long expireTimeMs = 1000 * 60 * 60; // 토큰 유효 시간: 1시간
+        long expireTimeMs = 1000 * 60 * 60 * 10; // 토큰 유효 시간: 10시간
         Date now = new Date(System.currentTimeMillis());
         Date exp = new Date(System.currentTimeMillis() + expireTimeMs);
 
