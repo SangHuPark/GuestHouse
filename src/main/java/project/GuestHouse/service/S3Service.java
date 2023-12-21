@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import project.GuestHouse.domain.entity.UserImage;
 import project.GuestHouse.domain.entity.User;
+import project.GuestHouse.exception.ErrorCode;
+import project.GuestHouse.exception.GuestException;
 import project.GuestHouse.repository.UserImageRepository;
+import project.GuestHouse.repository.UserRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,26 +25,30 @@ import java.util.UUID;
 public class S3Service {
 
     private final AmazonS3 amazonS3;
+    private final UserRepository userRepository;
     private final UserImageRepository userImageRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String saveImages(List<MultipartFile> MultipartFiles, User user) throws IOException {
+    /*public String saveImages(List<MultipartFile> MultipartFiles) throws IOException {
         List<String> imageList = new ArrayList<>();
 
         for (MultipartFile multipartFile : MultipartFiles) {
-            String value = saveImage(multipartFile, user);
+            String value = saveImage(multipartFile, "testEmail");
             imageList.add(value);
         }
 
         return imageList.toString();
-    }
+    }*/
 
-    public String saveImage(MultipartFile multipartFile, User user) {
+    public String saveImage(MultipartFile multipartFile, String email) {
         String originalName = multipartFile.getOriginalFilename();
         UserImage userImage = new UserImage(originalName);
         String filename = generateFileName(originalName);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new GuestException(ErrorCode.USER_EMAIL_NOT_FOUND));
 
         userImage.setStoredName(filename);
         userImage.setUser(user);
