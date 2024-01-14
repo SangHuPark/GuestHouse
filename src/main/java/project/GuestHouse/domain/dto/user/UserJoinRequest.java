@@ -12,18 +12,18 @@ import java.time.LocalDate;
 public class UserJoinRequest {
 
     @NotBlank
-    @Email(message = "올바른 형식의 이메일이 아닙니다.")
+    @Email(message = "사용자 이메일에 빈 문자열, 공백, null 은 허용되지 않습니다.")
     private String email;
 
-    @NotBlank(message = "올바른 형식의 비밀번호가 아닙니다.")
+    @NotBlank(message = "사용자 비밀번호에 빈 문자열, 공백, null 은 허용되지 않습니다.")
     @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,20}", message = "비밀번호는 8~20 길이의 영문, 숫자, 특수문자를 포함해야 합니다.")
     private String password;
 
-    /*
-    @NotBlank(message = "올바른 형식의 이름이 아닙니다.")
+    @NotBlank(message = "사용자 이름에 빈 문자열, 공백, null 은 허용되지 않습니다.")
     @Size(min = 2, message = "이름은 2자 이상 입력하세요.")
     private String userName;
 
+    /*
     @NotBlank(message = "올바른 형식의 닉네임이 아닙니다.")
     @Size(min = 2, max = 10, message = "닉네임의 길이는 2자 이상 10자 이하로 입력하세요.")
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,10}$", message = "닉네임은 특수문자를 제외한 2~10 자리여야 합니다.")
@@ -36,6 +36,8 @@ public class UserJoinRequest {
 
     private MultipartFile profileImg;
 
+    @NotBlank(message = "휴대전화번호에 빈 문자열, 공백, null 은 허용되지 않습니다.")
+    @Size(min = 11, message = "휴대전화번호는 11자를 입력해야 합니다.")
     private String phoneNum;
 
     public User toEntity(String password, LocalDate birth) {
@@ -43,7 +45,7 @@ public class UserJoinRequest {
                 .email(this.email)
                 .password(password)
 //                .userName(userName)
-                .userName("defaultUserName")
+                .userName(this.userName)
 //                .userNickname(userNickname)
                 .userNickname("defaultUserNickname")
                 .birth(birth)

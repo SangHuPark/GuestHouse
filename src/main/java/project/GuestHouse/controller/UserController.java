@@ -52,29 +52,30 @@ public class UserController {
                     .body(userJoinResponse).build(), HttpStatus.OK);
             // return Response.success("회원가입 완료", new UserJoinResponse(userDto.getEmail(), userDto.getNickname());
         } catch (Exception e) {
+            UserFailResponse userFailResponse = new UserFailResponse(e.getMessage());
             return new ResponseEntity<>(Response.builder()
                     .isSuccess(false)
                     .message("회원가입 실패")
-                    .body(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+                    .body(userFailResponse).build(), HttpStatus.BAD_REQUEST);
         }
 
     }
 
     @PostMapping("/mail/confirm")
-    public ResponseEntity<?> mailConfirm(@Valid @RequestBody HashMap<String, String> request) {
-        String email = request.get("email");
+    public ResponseEntity<?> mailConfirm(@RequestBody String email) {
+//        String email = request.get("email");
         Boolean result = userService.duplicateUserByEmail(email);
 
         if (result) {
             return new ResponseEntity<>(Response.builder()
                     .isSuccess(true)
                     .message("사용 가능한 이메일 입니다.")
-                    .body("user_email: " + email).build(), HttpStatus.OK);
+                    .body("").build(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(Response.builder()
                     .isSuccess(false)
                     .message("이미 사용 중인 이메일 입니다.")
-                    .body("user_email: " + email).build(), HttpStatus.NOT_ACCEPTABLE);
+                    .body("").build(), HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
@@ -119,11 +120,18 @@ public class UserController {
                     .body(userLoginResponse).build(), HttpStatus.OK);
             // return Respose.success("로그인 성공", userLoginResponse);
         } catch (Exception e) {
+            UserFailResponse userFailResponse = new UserFailResponse(e.getMessage());
             return new ResponseEntity<>(Response.builder()
                     .isSuccess(false)
                     .message("로그인 실패")
-                    .body(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+                    .body(userFailResponse).build(), HttpStatus.BAD_REQUEST);
         }
+        /*bindingResultErrorsCheck(bindingResult);
+        UserLoginResponse userLoginResponse = userService.login(userLoginRequest);
+        return new ResponseEntity<>(Response.builder()
+                .isSuccess(true)
+                .message("로그인 성공")
+                .body(userLoginResponse).build(), HttpStatus.OK);*/
     }
 
     @GetMapping("/search/all")

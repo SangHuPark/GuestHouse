@@ -1,12 +1,12 @@
-package project.GuestHouse.exception;
+package project.GuestHouse.exception.errorCode;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
-public enum ErrorCode {
+public enum UserErrorCode implements ErrorCode {
 
     // API
     DUPLICATED_USER_EMAIL(HttpStatus.CONFLICT, 409, "이미 가입한 사용자 email 입니다."),

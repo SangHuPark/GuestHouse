@@ -10,7 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import project.GuestHouse.exception.JwtAccessDeniedHandler;
+import project.GuestHouse.exception.handler.JwtAccessDeniedHandler;
 import project.GuestHouse.exception.JwtAuthenticationEntryPoint;
 import project.GuestHouse.auth.JwtFilter;
 import project.GuestHouse.auth.JwtTokenProvider;

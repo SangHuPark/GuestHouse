@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import project.GuestHouse.domain.dto.user.*;
 import project.GuestHouse.domain.entity.User;
 import project.GuestHouse.domain.entity.UserImage;
-import project.GuestHouse.exception.ErrorCode;
-import project.GuestHouse.exception.GuestException;
+import project.GuestHouse.exception.errorCode.UserErrorCode;
+import project.GuestHouse.exception.exception.ApiException;
 import project.GuestHouse.auth.JwtTokenProvider;
 import project.GuestHouse.repository.UserImageRepository;
 import project.GuestHouse.repository.UserRepository;
@@ -33,7 +33,7 @@ public class UserService {
         LocalDate birth = LocalDate.parse("2000-01-01", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         if(userRepository.findByPhoneNum(userJoinRequest.getPhoneNum()) != null)
-            throw new GuestException(ErrorCode.DUPLICATED_USER_PHONENUM);
+            throw new ApiException(UserErrorCode.DUPLICATED_USER_PHONENUM);
 
         userRepository.save(
             userJoinRequest.toEntity(
@@ -49,7 +49,7 @@ public class UserService {
         String email = userLoginRequest.getEmail();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new GuestException(ErrorCode.USER_EMAIL_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_EMAIL_NOT_FOUND));
 
         String imageUrl = "https://invitbucket.s3.ap-northeast-2.amazonaws.com/defaultUserProfileImage.svg";
 
@@ -59,7 +59,7 @@ public class UserService {
         }
 
         if (!encoder.matches(userLoginRequest.getPassword(), user.getPassword())) {
-            throw new GuestException(ErrorCode.INVALID_PASSWORD);
+            throw new ApiException(UserErrorCode.INVALID_PASSWORD);
         }
 
         String token = jwtTokenProvider.createToken(user.getEmail());
@@ -77,7 +77,7 @@ public class UserService {
 
     public UserSearchResponse findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new GuestException(ErrorCode.USER_EMAIL_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_EMAIL_NOT_FOUND));
         return new UserSearchResponse(user);
     }
 
@@ -90,14 +90,14 @@ public class UserService {
     public void updateUserPassword(Long id, String password) {
         // null 이 아니면 get()의 결과가 넘어온다.
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_ID_NOT_FOUND));
         user.updatePassword(encoder.encode(password));
         userRepository.save(user);
     }
 
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new GuestException(ErrorCode.USER_ID_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_ID_NOT_FOUND));
         user.delete();
     }
 

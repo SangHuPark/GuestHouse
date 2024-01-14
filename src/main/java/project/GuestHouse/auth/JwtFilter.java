@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import project.GuestHouse.exception.ErrorCode;
+import project.GuestHouse.exception.errorCode.UserErrorCode;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -77,9 +77,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication); */
             }
         } catch (ExpiredJwtException e) {
-            request.setAttribute("exception", ErrorCode.TOKEN_EXPIRED_ERROR.name());
+            request.setAttribute("exception", UserErrorCode.TOKEN_EXPIRED_ERROR.name());
         } catch(SignatureException e) {
-            request.setAttribute("exception", ErrorCode.TOKEN_SIGNATURE_ERROR.name());
+            request.setAttribute("exception", UserErrorCode.TOKEN_SIGNATURE_ERROR.name());
         }catch (Exception e){
             logger.error("[Exception] cause: {} , message: {}" + NestedExceptionUtils.getMostSpecificCause(e) + e.getMessage());
             e.printStackTrace();
