@@ -9,14 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import project.GuestHouse.domain.entity.UserImage;
 import project.GuestHouse.domain.entity.User;
-import project.GuestHouse.exception.ErrorCode;
-import project.GuestHouse.exception.GuestException;
+import project.GuestHouse.exception.errorCode.UserErrorCode;
+import project.GuestHouse.exception.exception.ApiException;
 import project.GuestHouse.repository.UserImageRepository;
 import project.GuestHouse.repository.UserRepository;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -48,7 +46,7 @@ public class S3Service {
         String filename = generateFileName(originalName);
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new GuestException(ErrorCode.USER_EMAIL_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_EMAIL_NOT_FOUND));
 
         userImage.setStoredName(filename);
         userImage.setUser(user);

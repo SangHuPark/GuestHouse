@@ -1,4 +1,4 @@
-package project.GuestHouse.exception;
+package project.GuestHouse.exception.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -18,26 +19,18 @@ public class ErrorResponse {
 
     private final boolean isSuccess = false;
     private final HttpStatus httpStatus;
-    private final int code;
+    private final String code;
     private final String message;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL) // errors 가 없다면 응답으로 내려가지 않도록 JsonInclude 어노테이션 추가. (NON_NULL 시 null 인 데이터를 제외)
+    // errors 가 없다면 응답으로 내려가지 않도록 JsonInclude 어노테이션 추가. (NON_NULL 시 null 인 데이터를 제외)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final List<ValidationError> errors;
 
-    public static ErrorResponse of (HttpStatus httpStatus,int code, String message) {
+    public static ErrorResponse of (HttpStatus httpStatus, String code, String message) {
         return ErrorResponse.builder()
                 .httpStatus(httpStatus)
                 .code(code)
                 .message(message)
-                .build();
-    }
-
-    public static ErrorResponse of (HttpStatus httpStatus,int code, String message, BindingResult bindingResult) {
-        return ErrorResponse.builder()
-                .httpStatus(httpStatus)
-                .code(code)
-                .message(message)
-                .errors(ValidationError.of(bindingResult))
                 .build();
     }
 
@@ -47,9 +40,9 @@ public class ErrorResponse {
         private final String value;
         private final String message;
 
-        private ValidationError(FieldError fieldError){
+        private ValidationError(FieldError fieldError) {
             this.field = fieldError.getField();
-            this.value = fieldError.getRejectedValue() == null? "" :fieldError.getRejectedValue().toString() ;
+            this.value = fieldError.getRejectedValue() == null? "" : fieldError.getRejectedValue().toString() ;
             this.message = fieldError.getDefaultMessage();
         }
 

@@ -20,17 +20,17 @@
 //    @Column(name = "accommodation_name", nullable = true, length = 20)
 //    private String accommodationName;
 //
-//    @Column(name = "introduce", nullable = true, length = 20)
-//    private String introduce;
+//    @Column(name = "description", nullable = true, length = 20)
+//    private String description;
 //
 //    @Column(name = "address", nullable = true, length = 40)
 //    private String address;
 //
-//    @Column(name = "longitude", nullable = true)
-//    private BigDecimal longitude;
+//    @Column(nullable = true)
+//    private String x; // longitude 경도
 //
-//    @Column(name = "latitude", nullable = true)
-//    private BigDecimal latitude;
+//    @Column(nullable = true)
+//    private String y; // latitude 위도
 //
 //    @Column(name = "bookmark")
 //    private int bookmark;
